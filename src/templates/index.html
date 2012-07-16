@@ -15,10 +15,11 @@
               color: #333;
               font: 14px helvetica, sans-serif;
               background: #ddd;
-              background: -webkit-radial-gradient(circle,#aaa,#eee 60%) center fixed;
+/*              background: -webkit-radial-gradient(circle,#aaa,#eee 60%) center fixed;
               background: -moz-radial-gradient(circle,#aaa,#eee 60%) center fixed;
               background: -ms-radial-gradient(circle,#aaa,#eee 60%) center fixed;
               background: -o-radial-gradient(circle,#aaa,#eee 60%) center fixed;
+*/
               border-top: 8px solid rgba(51,51,51,.8);
             }
             #wrapper {
@@ -26,11 +27,11 @@
               margin-top: 160px;
               padding: 15px;
               background: #eee;
-              background: -webkit-linear-gradient(#fff,#ccc);
+/*              background: -webkit-linear-gradient(#fff,#ccc);
               background: -moz-linear-gradient(#fff,#ccc);
               background: -ms-linear-gradient(#fff,#ccc);
               background: -o-linear-gradient(#fff,#ccc);
-              opacity: .9;
+*/              opacity: .9;
               box-shadow: 0px 1px 8px rgba(0,0,0,0.3);
             }
             #inner {
@@ -120,16 +121,39 @@
         <link href="static/custom/index.css" rel="stylesheet"> 
 
         <div id="wrapper">
+          <div id="description-head">Talk as you type. Share the recording.</div>
+          <div id="description-subhead">Your ethercast will play pixel-perfect and artifact-free 
+            <BR>...even on a Retina display iPad
+            <BR>...even in a coffeeshop.</div>
+        
             <div id="inner">
-                <div id="button" onclick="go2Random()" class="translate">New Pad</div>
-                <div id="label" class="translate">or create/open a Pad with the name</div> 
-                <form action="#" onsubmit="go2Name();return false;"> 
+                <div id="button" onclick="go2Random()" class="translate">Start</div>
+                <div id="label" class="translate" style="display:none;">or create a Pad with the name</div> 
+                <form action="#" onsubmit="go2Name();return false;" style="display:none;"> 
                     <input type="text" id="padname" autofocus x-webkit-speech> 
                     <button type="submit">OK</button>
                 </form>
             </div>
-        </div>
 
+            <div class="disclaimer">
+              Ethercasting is not yet publicly-available on this site. 
+              <BR>Until then, you can record and view ethercasts on <A HREF="http://sketchpad.cc">studio sketchpad.</A> 
+              <BR>Here is <A HREF="http://studio.sketchpad.cc/sp/pad/view/ro.9KPxftbkKN$2Z/latest?soundcloud_url=http://soundcloud.com/aribadernatal/sketchcast_1342117029538" target="_blank" style="color:black;">an example ethercast</A> on Sketchpad. 
+              </div>
+              
+        </div>
+        
+        
+        <div class="credits">
+          Ethercast is built on <A HREF="http://popcornjs.org/" target="_blank">Popcorn.js</A> and <A HREF="http://etherpad.org/" target="_blank">Etherpad Lite</A>. 
+          
+          <BR>
+            Want to enable ethercasting on your own Etherpad Lite server? Just add the <B>"Ethercast"</B> plugin.
+            <BR><BR><BR>
+              <div>Ethercast was created by <A HREF="http://aribadernatal.com">Ari Bader-Natal</A>, and is a <A HREF="http://www.shuttleworthfoundation.org/" target="_blank">Shuttleworth funded</A> project.<BR>2012
+              </div>
+        </div>
+        
         <script src="static/custom/index.js"></script>
         <script> 
       
