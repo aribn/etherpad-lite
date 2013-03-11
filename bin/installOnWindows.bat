@@ -12,8 +12,8 @@ set check_version="if(['6','8'].indexOf(process.version.split('.')[1].toString()
 cmd /C node -e %check_version% || exit /B 1
 
 echo _
-echo Installing etherpad-lite and dependencies...
-cmd /C npm install src/ || exit /B 1
+echo Ensure that all dependencies are up to date...  If this is the first time you have run Etherpad please be patient.
+cmd /C npm install src/ --loglevel warn || exit /B 1
 
 echo _
 echo Copying custom templates...
@@ -36,4 +36,4 @@ IF NOT EXIST settings.json (
 )
 
 echo _
-echo Installed Etherpad-lite!  To run Etherpad type start.bat
+echo Installed Etherpad!  To run Etherpad type start.bat

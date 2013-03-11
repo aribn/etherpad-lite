@@ -156,10 +156,7 @@ var padeditbar = (function()
             else if (cmd == 'insertorderedlist') ace.ace_doInsertOrderedList();
             else if (cmd == 'indent')
             {
-              if (!ace.ace_doIndentOutdent(false))
-              {
-                ace.ace_doInsertUnorderedList();
-              }
+              ace.ace_doIndentOutdent(false);
             }
             else if (cmd == 'outdent')
             {
@@ -169,7 +166,7 @@ var padeditbar = (function()
             {
               if ((!(ace.ace_getRep().selStart && ace.ace_getRep().selEnd)) || ace.ace_isCaret())
               {
-                if (window.confirm("Clear authorship colors on entire document?"))
+                if (window.confirm(html10n.get("pad.editbar.clearcolors")))
                 {
                   ace.ace_performDocumentApplyAttributesToCharRange(0, ace.ace_getRep().alltext.length, [
                     ['author', '']

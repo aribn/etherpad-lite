@@ -1,7 +1,10 @@
+<%
+  var settings = require("ep_etherpad-lite/node/utils/Settings");
+%>
 <!doctype html>
 <html>
 
-        <title>Etherpad Lite</title>
+        <title><%=settings.title%></title>
 	<script>
 	  /*
 	  |@licstart  The following is the entire license notice for the
@@ -28,8 +31,11 @@
 
         <meta charset="utf-8"> 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+        <link rel="shortcut icon" href="<%=settings.favicon%>">
 
-        <link rel="shortcut icon" href="favicon.ico">
+        <link rel="localizations" type="application/l10n+json" href="locales.json">
+        <script type="text/javascript" src="static/js/html10n.js"></script>
+        <script type="text/javascript" src="static/js/l10n.js"></script>
 
         <style>
             html, body {
@@ -61,7 +67,8 @@
               box-shadow: 0px 1px 8px rgba(0,0,0,0.3);
             }
             #inner {
-              width: 300px;
+              position:relative;
+              max-width: 300px;
               margin: 0 auto;
             }
             #button {
@@ -97,6 +104,10 @@
               text-shadow: 0 1px 1px #fff;
               margin: 16px auto 0;
             }
+            #padname{
+              height:38px;
+              max-width:280px;
+            }
             form {
               height: 38px;
               background: #fff;
@@ -112,7 +123,8 @@
               border-radius: 3px;
               box-sizing: border-box;
               -moz-box-sizing: border-box;   
-              padding: 0 45px 0 10px;
+              line-height:36px; /* IE8 hack */
+              padding: 0px 45px 0 10px;
               *padding: 0; /* IE7 hack */
               width: 100%;
               height: 100%;
@@ -122,7 +134,7 @@
             }
             button[type="submit"] {
               position: absolute;
-              right: 0;
+              left:253px;
               width: 45px;
               height: 38px;
             }
@@ -147,19 +159,23 @@
         <link href="static/custom/index.css" rel="stylesheet"> 
 
         <div id="wrapper">
+        <% e.begin_block("indexWrapper"); %>
           <div id="description-head">Talk as you type. Share the recording.</div>
-          <div id="description-subhead">Your ethercast will play pixel-perfect and artifact-free 
+          <div id="description-subhead">Your ethercast will play pixel-perfect and artifact-free
             <BR>...even on a Retina display iPad
-            <BR>...even in a coffeeshop.</div>
-        
+            <BR>...even in a coffeeshop.
+          </div>
+
             <div id="inner">
-                <div id="button" onclick="go2Random()" class="translate">Start</div>
-                <div id="label" class="translate" style="display:none;">or create a Pad with the name</div> 
-                <form action="#" onsubmit="go2Name();return false;" style="display:none;"> 
+                <div id="button" onclick="go2Random()" data-l10n-id="index.newPad"></div>
+                <div id="label" data-l10n-id="index.createOpenPad"></div> 
+                <form action="#" onsubmit="go2Name();return false;"> 
                     <input type="text" id="padname" autofocus x-webkit-speech> 
                     <button type="submit">OK</button>
                 </form>
             </div>
+        <% e.end_block(); %>
+        </div>
 
             <div class="disclaimer">
               Ethercasting is not yet publicly-available on this site. 
@@ -210,5 +226,4 @@
             // start the custom js
             if (typeof customStart == "function") customStart();
         </script>
-
 </html>

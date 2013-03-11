@@ -25,9 +25,24 @@ var path = require('path');
 var argv = require('./Cli').argv;
 var npm = require("npm/lib/npm.js");
 var vm = require('vm');
+var log4js = require("log4js");
+var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+
 
 /* Root path of the installation */
 exports.root = path.normalize(path.join(npm.dir, ".."));
+
+/**
+ * The app title, visible e.g. in the browser window
+ */
+exports.title = "Etherpad Lite";
+
+/**
+ * The app favicon fully specified url, visible e.g. in the browser window
+ */
+exports.favicon = "favicon.ico";
+exports.faviconPad = "../" + exports.favicon;
+exports.faviconTimeslider = "../../" + exports.favicon;
 
 /**
  * The IP ep-lite should listen to
@@ -38,6 +53,18 @@ exports.ip = "0.0.0.0";
  * The Port ep-lite should listen to
  */
 exports.port = process.env.PORT || 9001;
+
+/**
+ * The SSL signed server key and the Certificate Authority's own certificate
+ * default case: ep-lite does *not* use SSL. A signed server key is not required in this case.
+ */
+exports.ssl = false;
+
+/**
+ * socket.io transport methods
+ **/
+exports.socketTransportProtocols = ['xhr-polling', 'jsonp-polling', 'htmlfile'];
+
 /*
  * The Type of the database
  */
@@ -82,6 +109,16 @@ exports.abiword = null;
  */
 exports.loglevel = "INFO";
 
+/*
+* log4js appender configuration
+*/
+exports.logconfig = { appenders: [{ type: "console" }]};
+
+/*
+* Session Key, do not sure this.
+*/
+exports.sessionKey = false;
+
 /* This setting is used if you need authentication and/or
  * authorization. Note: /admin always requires authentication, and
  * either authorization by a module, or a user with is_admin set */
@@ -102,50 +139,66 @@ exports.abiwordAvailable = function()
   }
 }
 
-// Discover where the settings file lives
-var settingsFilename = argv.settings || "settings.json";
-settingsFilename = path.resolve(path.join(root, settingsFilename));
+exports.reloadSettings = function reloadSettings() {
+  // Discover where the settings file lives
+  var settingsFilename = argv.settings || "settings.json";
+  settingsFilename = path.resolve(path.join(root, settingsFilename));
 
-var settingsStr;
-try{
-  //read the settings sync
-  settingsStr = fs.readFileSync(settingsFilename).toString();
-} catch(e){
-  console.warn('No settings file found. Continuing using defaults!');
-}
-
-// try to parse the settings
-var settings;
-try {
-  if(settingsStr) {
-    settings = vm.runInContext('exports = '+settingsStr, vm.createContext(), "settings.json");
+  var settingsStr;
+  try{
+    //read the settings sync
+    settingsStr = fs.readFileSync(settingsFilename).toString();
+  } catch(e){
+    console.warn('No settings file found. Continuing using defaults!');
   }
-}catch(e){
-  console.error('There was an error processing your settings.json file: '+e.message);
-  process.exit(1);
-}
 
-//loop trough the settings
-for(var i in settings)
-{
-  //test if the setting start with a low character
-  if(i.charAt(0).search("[a-z]") !== 0)
+  // try to parse the settings
+  var settings;
+  try {
+    if(settingsStr) {
+      settings = vm.runInContext('exports = '+settingsStr, vm.createContext(), "settings.json");
+      settings = JSON.parse(JSON.stringify(settings)) // fix objects having constructors of other vm.context
+    }
+  }catch(e){
+    console.error('There was an error processing your settings.json file: '+e.message);
+    process.exit(1);
+  }
+
+  //loop trough the settings
+  for(var i in settings)
   {
-    console.warn("Settings should start with a low character: '" + i + "'");
+    //test if the setting start with a low character
+    if(i.charAt(0).search("[a-z]") !== 0)
+    {
+      console.warn("Settings should start with a low character: '" + i + "'");
+    }
+
+    //we know this setting, so we overwrite it
+    //or it's a settings hash, specific to a plugin
+    if(exports[i] !== undefined || i.indexOf('ep_')==0)
+    {
+      exports[i] = settings[i];
+    }
+    //this setting is unkown, output a warning and throw it away
+    else
+    {
+      console.warn("Unknown Setting: '" + i + "'. This setting doesn't exist or it was removed");
+    }
+  }
+  
+  log4js.configure(exports.logconfig);//Configure the logging appenders
+  log4js.setGlobalLogLevel(exports.loglevel);//set loglevel
+  log4js.replaceConsole();
+
+  if(!exports.sessionKey){ // If the secretKey isn't set we also create yet another unique value here
+    exports.sessionKey = randomString(32);
+    console.warn("You need to set a sessionKey value in settings.json, this will allow your users to reconnect to your Etherpad Instance if your instance restarts");
   }
 
-  //we know this setting, so we overwrite it
-  if(exports[i] !== undefined)
-  {
-    exports[i] = settings[i];
-  }
-  //this setting is unkown, output a warning and throw it away
-  else
-  {
-    console.warn("Unknown Setting: '" + i + "'. This setting doesn't exist or it was removed");
+  if(exports.dbType === "dirty"){
+    console.warn("DirtyDB is used. This is fine for testing but not recommended for production.")
   }
 }
 
-if(exports.dbType === "dirty"){
-  console.warn("DirtyDB is used. This is fine for testing but not recommended for production.")
-}
+// initially load settings
+exports.reloadSettings();
